@@ -1,0 +1,34 @@
+version: '3.9'
+
+networks:
+  internal:
+
+services:
+  todos:
+    container_name: todos
+    image: ghcr.io/rmvs/django-microservices-todos:latest
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+           - node.role == worker
+    # build:
+    #   context: ./todos
+    networks:
+      - internal
+    ports:
+      - "8080:8000"
+  users:
+    container_name: users
+    image: ghcr.io/rmvs/django-microservices-users:latest
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+           - node.role == worker
+    networks:
+      - internal
+    ports:
+      - "8081:8000"
