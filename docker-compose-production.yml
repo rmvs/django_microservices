@@ -15,6 +15,7 @@ services:
     deploy:
       mode: replicated
       labels:
+        - "com.docker.stack.namespace=DJANGO_MICROSERVICES"
         - "traefik.enable=true"
         - "traefik.http.routers.todos.rule=Host(`todos.dev.br`)"
         #- "traefik.http.routers.todos.rule=Host(`/todos`)"
@@ -38,6 +39,7 @@ services:
     deploy:
       mode: replicated
       labels:
+        - "com.docker.stack.namespace=DJANGO_MICROSERVICES"
         - "traefik.enable=true"
         #- "traefik.http.routers.users.rule=PathPrefix(`/users`)"
         #- "traefik.http.routers.users.rule=Host(`${TUNNEL_HOST}`) && PathPrefix(`/users`)"
