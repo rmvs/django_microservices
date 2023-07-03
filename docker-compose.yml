@@ -10,6 +10,9 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+      labels:
+        - traefik.http.routers.todos.rule=Host(`todos.dev`)
+        - traefik.http.services.todos-service.loadbalancer.server.port=8080
       placement:
         constraints:
            - node.role == worker
@@ -17,18 +20,17 @@ services:
     #   context: ./todos
     networks:
       - internal
-    ports:
-      - "8080:8000"
   users:
     container_name: users
     image: ghcr.io/rmvs/django-microservices-users:latest
     deploy:
       mode: replicated
       replicas: 1
+      labels:
+        - traefik.http.routers.users.rule=Host(`users.dev`)
+        - traefik.http.services.users-service.loadbalancer.server.port=8081
       placement:
         constraints:
            - node.role == worker
     networks:
       - internal
-    ports:
-      - "8081:8000"

@@ -1,0 +1,55 @@
+version: '3.9'
+
+networks:
+  DEFAULT_STACK_NETWORK:
+    external: true
+
+services:
+  traefik:
+    # The official v2 Traefik docker image
+    image: traefik:v2.10
+    # Enables the web UI and tells Traefik to listen to docker
+    command: |
+      --api.insecure=true
+      --accesslog=true
+      --providers.docker=true
+      --entryPoints.web.address=:80
+      --providers.docker.exposedbydefault=false
+      #--entryPoints.web.http.tls=false
+      #--entrypoints.web.http.redirections.entrypoint.to=:80
+      #--entryPoints.http.tls=false
+      #--providers.docker.endpoint=tcp://127.0.0.1:2377
+      --providers.docker.swarmMode=true
+      --providers.docker.network=DEFAULT_STACK_NETWORK
+      --log.level=debug
+    networks:
+      - DEFAULT_STACK_NETWORK
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "9090:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      #labels:
+        #- "traefik.enable=true"
+        #- "traefik.http.routers.traefik.rule=Host(`traefik.api.localhost`)"
+        #- "traefik.http.routers.traefik.entryPoints=web"
+        #- "traefik.http.services.traefik.loadbalancer.server.port=8080"
+      placement:
+        constraints:
+          - node.role == manager
+
+  whoami:
+    image: traefik/whoami
+    command: --port=2001
+    ports:
+      - 2001:2001
+    networks:
+      - DEFAULT_STACK_NETWORK
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
